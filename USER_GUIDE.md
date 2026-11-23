@@ -302,7 +302,10 @@ Settings are grouped into **System**, **Display**, **Reader**, **Controls**, **L
 
 - **Dictionary**: Select the StarDict dictionary used for word lookups while reading, or "None" to disable lookups. *(Only shown when at least one dictionary folder exists under `/dictionaries/` on the SD card — see [docs/dictionary.md](docs/dictionary.md) for setup and usage.)*
 
-- **Text Anti-Aliasing**: Whether to show smooth grey edges (anti-aliasing) on text in reading mode. Note this slows down page turns slightly.
+- **Text Anti-Aliasing**: Whether to show smooth grey edges (anti-aliasing) on text in reading mode. Note this slows down page turns slightly. On the EEGO Reader A4 this is a choice of three:
+  - **Off**: text is drawn in black and white only.
+  - **Standard** (default): grey edges on text.
+  - **Soft**: lighter, softer grey edges, with a slightly longer page turn.
 
 - **Images**: How embedded images (JPG/PNG/GIF) in EPUB files are shown. GIFs render only the first frame; interlaced GIFs are not supported.
   - **Display** (default): images in gray levels. Pages with images take an extra grayscale refresh.

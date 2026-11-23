@@ -120,9 +120,14 @@ void forEachBaseSetting(SettingVisitor visit, void* context) {
   emit(SettingInfo::Value(StrId::STR_PARAGRAPH_INDENTATION, &CrossPointSettings::paragraphIndentSpaces, {0, 5, 1},
                           "paragraphIndentSpaces", StrId::STR_CAT_READER)
            .withTextSettings());
-  emit(SettingInfo::Toggle(StrId::STR_TEXT_AA, &CrossPointSettings::textAntiAliasing, "textAntiAliasing",
-                           StrId::STR_CAT_READER)
-           .withTextSettings());
+  if (textAntiAliasingHasSoft())
+    emit(SettingInfo::StaticEnum(StrId::STR_TEXT_AA, &CrossPointSettings::textAntiAliasing, TEXT_AA_IDS,
+                                 "textAntiAliasing", StrId::STR_CAT_READER)
+             .withTextSettings());
+  else
+    emit(SettingInfo::Toggle(StrId::STR_TEXT_AA, &CrossPointSettings::textAntiAliasing, "textAntiAliasing",
+                             StrId::STR_CAT_READER)
+             .withTextSettings());
   emit(SettingInfo::Enum(StrId::STR_IMAGES, &CrossPointSettings::imageRendering,
                          {StrId::STR_IMAGES_DISPLAY, StrId::STR_IMAGES_PLACEHOLDER, StrId::STR_IMAGES_SUPPRESS,
                           StrId::STR_IMAGES_DISPLAY_BW},

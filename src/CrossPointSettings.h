@@ -220,6 +220,11 @@ class CrossPointSettings : public PersistableStore<CrossPointSettings> {
     IMAGE_RENDERING_COUNT
   };
 
+  // Text anti-aliasing. TEXT_AA_SOFT (EEGO A4 only) keeps every gray level
+  // where the panel otherwise draws the darkest gray as black; other boards
+  // store only Off/Standard. Persisted: 0 and 1 must stay Off and Standard.
+  enum TEXT_ANTI_ALIASING { TEXT_AA_OFF = 0, TEXT_AA_STANDARD = 1, TEXT_AA_SOFT = 2, TEXT_ANTI_ALIASING_COUNT };
+
   // How Select opens the reader menu: the classic full-screen list, or a toolbar
   // overlay (top/bottom bars with Contents / Text / More bottom-sheet panels)
   // painted over the page.
@@ -300,7 +305,7 @@ class CrossPointSettings : public PersistableStore<CrossPointSettings> {
   static constexpr uint8_t CHARACTER_SPACING_OFFSET = 2;  // stored 0..4 maps to -2..+2 px
   uint8_t characterSpacing = CHARACTER_SPACING_OFFSET;
   int8_t getCharacterSpacing() const { return static_cast<int8_t>(characterSpacing - CHARACTER_SPACING_OFFSET); }
-  uint8_t textAntiAliasing = 1;
+  uint8_t textAntiAliasing = TEXT_AA_STANDARD;
   // Short power button click behaviour
   uint8_t shortPwrBtn = IGNORE;
   // Power double click (see hasPowerDoubleClick()); Ignore disables the

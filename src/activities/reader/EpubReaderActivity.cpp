@@ -2187,17 +2187,17 @@ void EpubReaderActivity::renderContents(std::unique_ptr<Page> page, const int or
   } ditherScope{renderer};
   renderer.setDitherImagesInBw(!imageGrayscale);
   const bool pageHasImages = imageGrayscale && page->hasImages();
-  // Images keep every gray level on panels that otherwise render the text
-  // overlay with fewer.
+  // Images, and text with Soft anti-aliasing, keep every gray level on panels
+  // that otherwise render the overlay with fewer.
   struct FullToneScope {
     ~FullToneScope() { display.setOverlayFullTone(false); }
   } fullToneScope;
-  display.setOverlayFullTone(pageHasImages);
+  display.setOverlayFullTone(pageHasImages || SETTINGS.textAntiAliasing == CrossPointSettings::TEXT_AA_SOFT);
   const bool pageHasImagesNeedingDecode = pageHasImages && page->hasImagesNeedingDecode();
   const bool manualRefreshPending = forcedRefreshPending;
   forcedRefreshPending = false;
   const bool cleanImageBasePending = manualRefreshPending || pagesUntilFullRefresh <= 1;
-  const bool needsTextGrayscale = SETTINGS.textAntiAliasing;
+  const bool needsTextGrayscale = SETTINGS.textAntiAliasing != CrossPointSettings::TEXT_AA_OFF;
   const bool needsAnyGrayscale = needsTextGrayscale || pageHasImages;
   const bool absoluteImageGrayscale =
       pageHasImages && !gpio.deviceIsX3() &&

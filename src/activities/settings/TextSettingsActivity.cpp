@@ -14,6 +14,7 @@
 #include "MappedInputManager.h"
 #include "ReaderFontSizes.h"
 #include "ReaderLineSpacing.h"
+#include "ReaderTextAntiAliasing.h"
 #include "SdCardFontSystem.h"
 #include "TextSettingsPreview.h"
 #include "components/UITheme.h"
@@ -230,11 +231,14 @@ void TextSettingsActivity::buildScreen(UiScreen& screen) {
       case Tab::Layout:
         rowValues_[i] = layoutValueText(i);
         break;
+      case Tab::Style:
+        rowValues_[i] = styleValueText(i);
+        break;
       default:
         break;
     }
     rowItems_[i].value = rowValues_[i].empty() ? nullptr : rowValues_[i].c_str();
-    if (tab_ == Tab::Style) {
+    if (tab_ == Tab::Style && !isPickerStyleRow(i)) {
       GUI.setCheckboxRow(rowItems_[i], styleRowChecked(i));
     } else if (tab_ == Tab::Layout && i == static_cast<int>(LayoutRow::ParaSpacing)) {
       GUI.setCheckboxRow(rowItems_[i], SETTINGS.extraParagraphSpacing);
@@ -265,7 +269,7 @@ const char* TextSettingsActivity::confirmLabelText() const {
     case Tab::Layout:
       return ringPos() - 1 == static_cast<int>(LayoutRow::ParaSpacing) ? tr(STR_TOGGLE) : tr(STR_SELECT);
     case Tab::Style:
-      return tr(STR_TOGGLE);
+      return isPickerStyleRow(ringPos() - 1) ? tr(STR_SELECT) : tr(STR_TOGGLE);
     default:
       return tr(STR_SELECT);
   }
@@ -495,8 +499,18 @@ void TextSettingsActivity::confirmStyleRow(int row) {
       SETTINGS.embeddedStyle = !SETTINGS.embeddedStyle;
       break;
     case StyleRow::AntiAliasing:
-      SETTINGS.textAntiAliasing = !SETTINGS.textAntiAliasing;
-      break;
+      if (!textAntiAliasingHasSoft()) {
+        SETTINGS.textAntiAliasing =
+            SETTINGS.textAntiAliasing ? CrossPointSettings::TEXT_AA_OFF : CrossPointSettings::TEXT_AA_STANDARD;
+        break;
+      }
+      optionPopup_.show(StrId::STR_TEXT_AA, TEXT_AA_IDS, static_cast<int>(std::size(TEXT_AA_IDS)),
+                        SETTINGS.textAntiAliasing, [](int idx) {
+                          SETTINGS.textAntiAliasing = static_cast<uint8_t>(idx);
+                          SETTINGS.saveToFile();
+                        });
+      requestUpdate();
+      return;
 
     default:
       return;
@@ -514,11 +528,21 @@ bool TextSettingsActivity::styleRowChecked(int row) const {
     case StyleRow::EmbeddedStyle:
       return SETTINGS.embeddedStyle;
     case StyleRow::AntiAliasing:
-      return SETTINGS.textAntiAliasing;
+      return SETTINGS.textAntiAliasing != CrossPointSettings::TEXT_AA_OFF;
 
     default:
       return false;
   }
+}
+
+bool TextSettingsActivity::isPickerStyleRow(int row) const {
+  return static_cast<StyleRow>(row) == StyleRow::AntiAliasing && textAntiAliasingHasSoft();
+}
+
+std::string TextSettingsActivity::styleValueText(int row) const {
+  if (!isPickerStyleRow(row)) return "";
+  const uint8_t v = SETTINGS.textAntiAliasing;
+  return I18N.get(TEXT_AA_IDS[v < std::size(TEXT_AA_IDS) ? v : CrossPointSettings::TEXT_AA_STANDARD]);
 }
 
 void TextSettingsActivity::switchTab(const int direction) {

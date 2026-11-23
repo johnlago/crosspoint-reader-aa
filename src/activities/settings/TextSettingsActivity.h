@@ -67,6 +67,10 @@ class TextSettingsActivity final : public UiTabListActivity {
 
   std::string layoutValueText(int row) const;
   bool styleRowChecked(int row) const;
+  // Style rows that open a picker instead of toggling a checkbox.
+  bool isPickerStyleRow(int row) const;
+  // Value text for picker Style rows (empty for checkbox rows).
+  std::string styleValueText(int row) const;
   // Button-hint label for Confirm at the current ring position.
   const char* confirmLabelText() const;
   void switchTab(int direction = 1);
